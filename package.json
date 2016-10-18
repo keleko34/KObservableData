@@ -1,0 +1,58 @@
+{
+  "name": "KObservableData",
+  "version": "0.0.0",
+  "description": "Multilayer Observable data that uses KObservableArrays and KObservableObjects",
+  "keywords": [
+    "Object",
+    "Array",
+    "Bindable Data",
+    "Observable",
+    "Data Binding",
+    "Data Change Events"
+  ],
+  "author": {
+    "name": "Keleko34",
+    "email": "gregory.guidero@gmail.com"
+  },
+  "contributors": [
+    {
+      "name": "Gregory Guidero"
+    }
+  ],
+  "main": "index",
+  "license": {
+    "type": "MIT",
+    "url": "http://en.wikipedia.org/wiki/MIT_License"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/keleko34/KObservableData.git"
+  },
+  "bugs": {
+    "url": "https://github.com/keleko34/KObservableData/issues"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-closure-compiler": "^0.4.0",
+    "gulp-connect": "^5.0.0",
+    "gulp-file": "^0.2.0",
+    "gulp-inject": "^3.0.0",
+    "gulp-prompt": "^0.1.2",
+    "gulp-replace": "^0.5.4",
+    "sort-stream": "^1.0.1"
+  },
+  "scripts": {
+    "build": "gulp build"
+  },
+  "maintainers": [
+    {
+      "name": "keleko34",
+      "email": "gregory.guidero@gmail.com"
+    }
+  ],
+  "directories": {},
+  "dependencies": {
+    "KObservableArray": "^1.0.4",
+    "KObservableObject": "^1.0.2"
+  }
+}

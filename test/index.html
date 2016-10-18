@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Testing</title>
+    <script type="text/javascript" src="requirejs"></script>
+  </head>
+  <body>
+    <div id="testDisplay"></div>
+    <script type="text/javascript">
+      require(['/KObservableData/KObservableData.js'],function(CreateKObservableData){
+        var OData = CreateKObservableData("test","array");
+      });
+    </script>
+  </body>
+</html>

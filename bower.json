@@ -1,0 +1,30 @@
+{
+  "name": "KObservableData",
+  "description": "Multilayer Observable data that uses KObservableArrays and KObservableObjects",
+  "version": "1.0.2",
+  "main": "index",
+  "authors": [
+    "Keleko34"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "Object",
+    "Array",
+    "Bindable Data",
+    "Observable",
+    "Data Binding",
+    "Data Change Events"
+  ],
+  "homepage": "https://github.com/keleko34/KObservableData",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    ".gulp"
+  ],
+  "devDependencies": {
+    "requirejs": "~2.1.11"
+  }
+}

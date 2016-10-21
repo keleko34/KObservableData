@@ -3,18 +3,18 @@ var gulp = require('gulp')
   , prompt = require('gulp-prompt');
 
   var settings = global.gulp,
-      tasks = fs.readdirSync(settings.base+"/.gulp").filter(function(t){
-          return (t !== 'config.js' && t !== "Default");
+      tasks = fs.readdirSync(settings.base+"/.gulp/Tasks").filter(function(t){
+          return (t !== "Default");
       }),
       taskFiles = tasks.reduce(function(obj,v,k){
-          obj[v] = require(settings.base+'/.gulp/'+v+"/"+v);
+          obj[v] = require(settings.base+'/.gulp/Tasks/'+v+"/"+v);
           return obj;
       },{});
       pres = {};
 
 module.exports = function()
 {
-    
+    console.log("default");
 
     return function(done)
     {

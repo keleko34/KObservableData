@@ -7,6 +7,7 @@ var base = require('./../../Base'),
 
 module.exports = function(){
 
+console.log("task");
   var _Commands = {},
       _currentCommand = {},
       _values = {};

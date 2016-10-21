@@ -15,7 +15,7 @@ var settings = global.gulp,
 
 module.exports = function()
 {
-
+    console.log("build");
     return function(g)
     {
         console.log("build");

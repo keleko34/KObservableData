@@ -1,4 +1,5 @@
-var query = require('querystring')
+var base = require('./../../Base')
+  , query = require('querystring')
   , fs = require('fs')
   , connect = require('gulp-connect');
 
@@ -11,6 +12,7 @@ var settings = global.gulp,
 
 module.exports = function()
 {
+  console.log("server");
     function route(req,res,next)
     {
         var url = req.url.substring(1,req.url.length);
@@ -82,15 +84,20 @@ module.exports = function()
         return next();
     }
 
-    return function()
+    function Command(res)
     {
         connect.server({
-        root: '.',
+        root: (res.root && res.root.length !== 0 ? res.root : '.'),
         livereload: false,
-        port:8080,
+        port:(res.port && res.port.length !== 0 ? parseInt(res.port) : 8080),
         middleware:function(connect, opt){
             return [route]
             }
         });
     }
+
+    return base
+    .task('Task')
+    .command(Command)
+    .call();
 }

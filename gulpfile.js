@@ -1,16 +1,33 @@
-var gulp = require('gulp');
+var gulp = require('gulp'),
+    fs = require('fs');
 
 global.gulp = {};
-global.gulp.config = require('./.gulp/config.js');
+global.gulp.config = require('./.gulp/Config/Config.js');
 global.gulp.base = process.cwd().replace(/\\/g,"/");
 global.gulp.path = global.gulp.base+"/.gulp";
 
-gulp.task('build',require('./.gulp/Build/Build')());
+/* Gulp Task Modules
 
-gulp.task('watch',require('./.gulp/Watch/Watch')());
+   This Auto loads all tasks inside the .gulp Tasks folder, simply put new tasks
+   in there if you want them registered
+*/
 
-gulp.task('test',require('./.gulp/Test/Test')());
+try{
+  tasks = fs.readdirSync('./.gulp/Tasks');
+  if(tasks.length < 1){
+    console.error('\033[31You have no tasks to use, please create tasks under .gulp/Tasks/ in a way as: task/task.js \033[37m');
+    return;
+  }
+}
+catch(e){
+  if(e.code !== 'ENOENT'){
+    console.error('\033[31You do not have a Tasks folder in .gulp \033[37m');
+  }
+  console.error(e);
+  return;
+}
 
-gulp.task('server',require('./.gulp/Server/Server')());
-
-gulp.task('default',require('./.gulp/Default/Default')());
+for(var x=0;x<tasks.length;x++){
+  var task = require('./.gulp/Tasks/' + tasks[x] + '/' + tasks[x]);
+  gulp.task(tasks[x].toLowerCase(),task);
+}

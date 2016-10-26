@@ -9,7 +9,7 @@ module.exports = {
         type: "input",
         message: "Please enter a port for the server to use"
       },
-      action:'Reload'
+      action:'Root'
     },
     Root: {
       cmd: {

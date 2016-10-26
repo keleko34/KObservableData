@@ -12,7 +12,6 @@ var settings = global.gulp,
 
 module.exports = function()
 {
-  console.log("server");
     function route(req,res,next)
     {
         var url = req.url.substring(1,req.url.length);
@@ -97,7 +96,7 @@ module.exports = function()
     }
 
     return base
-    .task('Task')
+    .task('Server')
     .command(Command)
     .call();
 }

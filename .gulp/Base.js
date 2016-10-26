@@ -32,7 +32,7 @@ module.exports = (function(){
         args.push((c.cmd.help ? c.cmd.help : c.prompt.message));
         return args;
       }
-
+      
   /* runs the given command based on the name */
   function runCommand(commandName,options){
       /* set prompt options */
@@ -46,7 +46,6 @@ module.exports = (function(){
       if(options.prompt.type === 'list'){
         _prompts[commandName].choices = (typeof options.prompt.choices === 'function' ? options.prompt.choices(_values) : options.prompt.choices);
       }
-
       /* Run gulp prompt command */
       _gulp = _gulp.pipe(prompt.prompt(_prompts[commandName],method(commandName,options)));
   }

@@ -2,9 +2,9 @@ define(['KObservableArray','KObservableObject'],function(CreateKObservableArray,
 {
     /* Build */
     /* End Build */
-    function CreateKObservableData(name,type)
+    function CreateKObservableData(name)
     {
-
+        
     }
     return CreateKObservableData;
 }())

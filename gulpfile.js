@@ -2,9 +2,9 @@ var gulp = require('gulp'),
     fs = require('fs');
 
 global.gulp = {};
-global.gulp.config = require('./.gulp/Config/Config.js');
 global.gulp.base = process.cwd().replace(/\\/g,"/");
 global.gulp.path = global.gulp.base+"/.gulp";
+global.gulp.config = require('./.gulp/Config/Config.js');
 
 /* Gulp Task Modules
 

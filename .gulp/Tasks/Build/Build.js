@@ -5,11 +5,13 @@ var base = require('./../../Base')
   , sort = require('sort-stream')
   , replace = require('gulp-replace')
   , file = require('gulp-file')
+  , beautify = require('js-beautify').js_beautify
   , closureCompiler = require('gulp-closure-compiler')
   , fs = require('fs');
 
 module.exports = function()
 {
+    var masterSubs = [];
     
     function Exists(res,key){
         if(res.Component !== undefined){
@@ -68,37 +70,76 @@ module.exports = function()
         }
     }
 
-    function build(path)
+    function injector(oem,pathTo,name,subfiles,count,cb,sb)
+    {
+        console.log("building and injecting file: ",subfiles[count]);
+        build(oem,subfiles[count],function(p,n){
+            gulp.src(oem+'/Build/'+name+'.js')
+            .pipe(inject(gulp.src(oem+'/Build/'+n+'.js'),{
+                removeTags:true,
+                starttag: '/* Build */',
+                endtag: '/* End Build */',
+                transform: function(filepath,file,i,length){
+                    var contents = file.contents.toString('utf8');
+                    if((count+1) !== subfiles.length) contents += '\r\n/* Build */\r\n/* END BUILD */';
+                    return contents;
+                }
+            }))
+            .pipe(gulp.dest(oem+'/Build'))
+            .on('end',function(){
+                count += 1;
+                console.log(count,subfiles.length);
+                if(count === subfiles.length)
+                {
+                    return cb(pathTo,name);
+                }
+                
+                injector(oem,pathTo,name,subfiles,count,cb,sb);
+            })
+        },sb);
+    }
+
+    function build(oem,path,cb,sb)
     {
         var reD = /(define)(.*)(function\()(.*)(\))(.*)(?:{)/,
+            reD2 = /(define)(.*)(function\()(.*)(\))/,
             reE = /\}\)(?![\s\S]*}\))/m,
             reM = /(define\()(\[(.*?)\])/,
-            g = gulp.src(path),
-            subGulps = [];
+            name = path.substring((path.lastIndexOf("/")+1),path.lastIndexOf(".")),
+            pathTo = path.replace(name+".js",""),
+            subFiles = [];
 
-        return g.pipe(modify({
+        if(!sb) sb = "";
+
+        console.log("name: ",name, "dest: ",oem+'/Build');
+
+        return gulp.src(path).pipe(modify({
             fileModifier: function(file, contents){
                 var subModules = contents.match(reM)[0].replace(reM,"$3").replace(/\"/g,'').replace(/\'/g,'').split(',').filter(function(v){
                     return (v.length !== 0);
                 }),
+                subList = (sb.length !== 0 ? sb.split('.') : []);
+
+                console.log("SubModules: ",subModules);
+
                 subFiles = subModules.map(function(file){
                     if(file.indexOf('.') === -1 && file.indexOf('/') === -1){
                         //we have a bower or node_module
-                        var path = tryBower(file);
-                        if(path){
-                            return global.gulp.base+path;
+                        var module_path = tryBower(file);
+                        if(module_path){
+                            return global.gulp.base+module_path;
                         }
                     }
                     if(file.indexOf('.') === 0){
                         //we have a localized file
                         var local = path.substring(0,path.lastIndexOf('/')),
                             filePath = local+file.substring(1,file.length)+(file.indexOf('.',1) === -1 ? '.js' : '');
-                        console.log(filePath);
+
                         try{
-                            var fstat = fs.statSync(global.gulp.base+filePath);
+                            var fstat = fs.statSync(filePath);
                             if(fstat.isFile())
                             {
-                                return global.gulp.base+filePath;
+                                return filePath;
                             }
                         }
                         catch(e){
@@ -107,39 +148,81 @@ module.exports = function()
                     }
                     return "";
                 }).filter(function(file){
-                    return (file.length !== 0);
-                });
+                    var allowed = true;
+                    if(sb.length !== 0){
+                        var sp = sb.split(".");
 
-                console.log(subFiles);
-
-                subFiles.forEach(function(file){
-                    console.log("building and injecting file: ",file);
-                    g.pipe(inject(build(file),{
-                        starttag: '/* BUILD */',
-                        endtag: '/* END BUILD */',
-                        transform: function(filepath,file,i,length){
-                            var contents = file.contents.toString('utf8');
-                            console.log('altering main',filepath);
-                            return contents;
+                        function rec(subs,l)
+                        {
+                            console.log(subs,l);
+                            var subList = subs[parseInt(l[0])];
+                            if(subList.indexOf(file) !== -1){
+                                allowed = false;
+                            }
+                            else{
+                                l.splice(0,1);
+                                if(l.length !== 0) rec(subList,l);
+                            }
                         }
-                    }));
+                        rec(masterSubs,sp);
+                    }
+                    return (file.length !== 0 && allowed);
                 });
+                
+                var pushSub = subList.reduce(function(m,v){
+                    return m[parseInt(v)];
+                },masterSubs);
+                
+                if(subFiles.length !== 0){
+                    sb += (sb.length !== 0 ? "." : "")+(pushSub.length);
+                    pushSub.push(subFiles.slice());
+                }
+
+                console.log("subFiles: ",subFiles, subFiles.length);
                 return contents;
             }
-        }));
+        }))
+        .pipe(replace(reE,"}())"))
+        .pipe(replace(reD,("var Create"+name+" = (function(){")))
+        .pipe(replace(reD2,("var Create"+name+" = (function()")))
+        .pipe(gulp.dest(oem+'/Build'))
+        .on('end',function(){
+            if(subFiles.length === 0){
+                console.log("No Sub files on: ",name);
+                return gulp.src(oem+'/Build/'+name+".js")
+                .pipe(replace(/(\/\* Build)([\s\S]*?)(End Build \*\/)/,""))
+                .pipe(gulp.dest(oem+'/Build'))
+                .on('end',function(){
+                    return cb(pathTo,name);
+                });
+            }
+            
+            injector(oem,pathTo,name,subFiles,0,cb,sb); 
+        });
     }
 
     function Command(res)
     {
         console.log('\033[36mStarting to compile module:\033[37m',res.Component);
 
-        var reD = /(define)(.*)(function\()(.*)(\))(.*)(?:{)/,
-            reE = /\}\)(?![\s\S]*}\))/m;
+        return build(global.gulp.base+'/'+res.Component,global.gulp.base+'/'+res.Component+'/'+res.Component+'.js',function(p,n){
+            console.log('\033[36mRunning clojure compiler minification:\033[37m');
 
-        build(global.gulp.base+'/'+res.Component+'/'+res.Component+'.js')
-        .pipe(replace(reE,"}())"))
-        .pipe(replace(reD,("var Create"+res.Component+" = (function(){")))
-        .pipe(gulp.dest('./'+res.Component+'/Build'));
+            gulp.src(p+'Build/'+n+'.js')
+            .pipe(modify({
+                fileModifier: function(file,contents){
+                    return beautify(contents);
+                }
+            }))
+            .pipe(replace(/^\s*[\r\n]/gm,""))
+            .pipe(gulp.dest('./'+res.Component+'/Build'))
+            .pipe(closureCompiler({
+                compilerPath:"./compiler.jar",
+                fileName:res.Component+".min.js"
+            }))
+            .pipe(gulp.dest('./'+res.Component+'/Min'));
+        })
+        
         
         /*
         gulp.src('./'+res.Component+'/'+res.Component+'.js')
@@ -190,13 +273,7 @@ module.exports = function()
 
         */
 
-        console.log('\033[36mRunning clojure compiler minification:\033[37m');
-        gulp.src('./'+res.Component+'/Build/'+res.Component+'.js')
-        .pipe(closureCompiler({
-            compilerPath:"./compiler.jar",
-            fileName:res.Component+".min.js"
-        }))
-        .pipe(gulp.dest('./'+res.Component+'/Min'));
+        
     }
 
     return base

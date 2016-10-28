@@ -33,10 +33,11 @@
   },
   "devDependencies": {
     "commander": "^2.9.0",
-    "gulp": "^3.9.0",
+    "gulp": "^3.9.1",
     "gulp-closure-compiler": "^0.4.0",
     "gulp-connect": "^5.0.0",
     "gulp-file": "^0.2.0",
+    "gulp-fn": "0.0.0",
     "gulp-inject": "^3.0.0",
     "gulp-modify": "^0.1.1",
     "gulp-prompt": "^0.1.2",

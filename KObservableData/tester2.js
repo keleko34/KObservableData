@@ -1,7 +1,5 @@
-define(['KObservableArray','KObservableObject'],function(CreateKObservableArray,CreateKObservableObject)
+define(['KObservableArray','KObservableObject'],function(KArr,KObj)
 {
-    /* Build */
-    /* End Build */
     function CreateTester2(name)
     {
         

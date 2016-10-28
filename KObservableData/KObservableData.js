@@ -1,4 +1,4 @@
-define(['KObservableArray','KObservableObject','./tester'],function(CreateKObservableArray,CreateKObservableObject,tester)
+define(['KObservableArray','KObservableObject','./tester'],function(KArray,KObject,Ktester)
 {
     /* Build */
     /* End Build */

@@ -2,12 +2,9 @@ var base = require('./../../Base')
   , gulp = require('gulp')
   , modify = require('gulp-modify')
   , inject = require('gulp-inject')
-  , sort = require('sort-stream')
   , replace = require('gulp-replace')
-  , file = require('gulp-file')
   , beautify = require('js-beautify').js_beautify
   , closureCompiler = require('gulp-closure-compiler')
-  , fn = require('gulp-fn')
   , fs = require('fs');
 
 module.exports = function()

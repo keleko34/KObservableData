@@ -37,16 +37,17 @@
     "gulp-closure-compiler": "^0.4.0",
     "gulp-connect": "^5.0.0",
     "gulp-file": "^0.2.0",
-    "gulp-fn": "0.0.0",
     "gulp-inject": "^3.0.0",
     "gulp-modify": "^0.1.1",
     "gulp-prompt": "^0.1.2",
     "gulp-replace": "^0.5.4",
-    "js-beautify": "^1.6.4",
-    "sort-stream": "^1.0.1"
+    "js-beautify": "^1.6.4"
   },
   "scripts": {
-    "build": "gulp build"
+    "installer": "npm i git+https://github.com/keleko34/gulp.git -g && npm i && bower i",
+    "i": "npm i git+https://github.com/keleko34/gulp.git -g && npm i && bower i",
+    "build": "gulp build",
+    "server": "gulp server"
   },
   "maintainers": [
     {

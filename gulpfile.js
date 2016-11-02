@@ -1,17 +1,19 @@
-var gulp = require('gulp'),
+require('K_Tasks')();
+
+/*var gulp = require('gulp'),
     fs = require('fs');
 
 global.gulp = {};
 global.gulp.base = process.cwd().replace(/\\/g,"/");
 global.gulp.path = global.gulp.base+"/.gulp";
-global.gulp.config = require('./.gulp/Config/Config.js');
+global.gulp.config = require('./.gulp/Config/Config.js');*/
 
 /* Gulp Task Modules
 
    This Auto loads all tasks inside the .gulp Tasks folder, simply put new tasks
    in there if you want them registered
 */
-
+/*
 try{
   tasks = fs.readdirSync('./.gulp/Tasks');
   if(tasks.length < 1){
@@ -30,4 +32,4 @@ catch(e){
 for(var x=0;x<tasks.length;x++){
   var task = require('./.gulp/Tasks/' + tasks[x] + '/' + tasks[x]);
   gulp.task(tasks[x].toLowerCase(),task);
-}
+}*/

@@ -5,5 +5,4 @@ test
 examples
 *.sock
 .gulp
-Build
 Min

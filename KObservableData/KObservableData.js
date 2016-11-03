@@ -119,8 +119,10 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(Object.keys(parent.__kbparentupdatelisteners).length !== 0) nData.__kbparentupdatelisteners = parent.__kbparentupdatelisteners;
 
                 Object.defineProperties(nData,{
-                  addChildListener:setDescriptor(addChildListener),
-                  removeChildListener:setDescriptor(removeChildListener)
+                  addChildListener:setDescriptor(addChildListener("__kbparentlisteners")),
+                  removeChildListener:setDescriptor(removeChildListener("__kbparentlisteners")),
+                  addChildUpdateListener:setDescriptor(addChildListener("__kbparentupdatelisteners")),
+                  removeChildUpdateListener:setDescriptor(removeChildListener("__kbparentupdatelisteners"))
                 });
 
                 for(var x=0,val = undefined,len=props.length;x<len;x++)
@@ -242,14 +244,59 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         }
 
         /* add these to all children as well and use scopestring process */
-        function addChildListener(prop,func)
+        function addChildListener(type)
         {
+            return function(prop,func)
+            {
+              function recAddListener(objarr,prop,func)
+              {
+                var children = Object.keys(objarr).filter(function(p){
+                  return (isObject(objarr[p]) || isArray(objarr[p]));
+                });
 
+                if(objarr[type][prop] === undefined) objarr[type][prop] = [];
+
+                objarr[type][prop].push(func);
+
+                for(var x=0,len=children.length;x<children;x++)
+                {
+                  recAddListener(children[x],prop,func);
+                }
+              }
+
+              recAddListener(this,prop,func);
+              return this;
+            }
         }
 
-        function removeChildListener(prop,func)
+        function removeChildListener(type)
         {
+            return function(prop,func)
+            {
+              function recRemoveListener(objarr,prop,func)
+              {
+                var children = Object.keys(objarr).filter(function(p){
+                  return (isObject(objarr[p]) || isArray(objarr[p]));
+                });
+                
+                loop:for(var i=0,lenI=objarr[type][prop].length;i<lenI;i++)
+                {
+                  if(objarr[type][prop][i].toString() === func.toString())
+                  {
+                      objarr[type][prop].splice(i,1);
+                      break loop;
+                  }
+                }
 
+                for(var x=0,len=children.length;x<children;x++)
+                {
+                  recRemoveListener(children[x],prop,func);
+                }
+              }
+
+              recRemoveListener(this,prop,func);
+              return this;
+            }
         }
 
         function subscribe(prop,func)
@@ -319,6 +366,14 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
           {
             _data = (isObject(data) ? KObject(_name) : (isArray(data) ? KArray(_name) : _data)),
             _dKeys = Object.keys(data);
+
+            Object.defineProperties(_data,{
+              addChildListener:setDescriptor(addChildListener("__kbparentlisteners")),
+              removeChildListener:setDescriptor(removeChildListener("__kbparentlisteners")),
+              addChildUpdateListener:setDescriptor(addChildListener("__kbparentupdatelisteners")),
+              removeChildUpdateListener:setDescriptor(removeChildListener("__kbparentupdatelisteners"))
+            });
+
             for(var x=0,prop=undefined,len=_dKeys.length;x<len;x++)
             {
               prop = data[_dKeys[x]];
@@ -364,9 +419,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
           __kbdatacreatelisteners:setDescriptor([]),
           __kbdatadeletelisteners:setDescriptor([]),
           addActionListener:setDescriptor(addActionListener),
-          removeActionListener:setDescriptor(removeActionListener),
-          addChildListener:setDescriptor(addChildListener),
-          removeChildListener:setDescriptor(removeChildListener)
+          removeActionListener:setDescriptor(removeActionListener)
         });
 
         Object.defineProperties(_obj,{

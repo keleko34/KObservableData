@@ -211,14 +211,34 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return _data.stringify();
         }
 
-        function addListener(prop,func)
+        /* these need ability for scopestrings */
+        function addListener(type)
         {
-
+            var _listeners = this[type];
+            return function(prop,func)
+            {
+                _listeners[prop] = func;
+                return this;
+            }
         }
 
-        function removeListener(prop,func)
+        function removeListener(type)
         {
+            var _listeners = this[type];
+            return function(prop,func)
+            {
+                if(func !== undefined) _listeners = _listeners[prop];
 
+                for(var x=0,len=_listeners.length;x<len;x++)
+                {
+                    if(_listeners[x].toString() === func.toString())
+                    {
+                        _listeners.splice(x,1);
+                        return this;
+                    }
+                }
+                return this;
+            }
         }
 
         /* add these to all children as well and use scopestring process */
@@ -297,8 +317,22 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
           if(name !== undefined && typeof name === 'string') _name = name;
           if(data !== undefined)
           {
-            _data = (isObject(data) ? KObject(_name) : (isArray(data) ? KArray(_name) : _data);
+            _data = (isObject(data) ? KObject(_name) : (isArray(data) ? KArray(_name) : _data)),
+            _dKeys = Object.keys(data);
+            for(var x=0,prop=undefined,len=_dKeys.length;x<len;x++)
+            {
+              prop = data[_dKeys[x]];
+              if(isOBject(prop) || isArray(prop))
+              {
+                  _data.add(_dKeys[x],parseData(_data,_dKeys[x],prop));
+              }
+              else
+              {
+                _data.add(_dKeys[x],prop);
+              }
+            }
           }
+          return this;
         }
 
 
@@ -333,6 +367,17 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
           removeActionListener:setDescriptor(removeActionListener),
           addChildListener:setDescriptor(addChildListener),
           removeChildListener:setDescriptor(removeChildListener)
+        });
+
+        Object.defineProperties(_obj,{
+            addDataListener:setDescriptor(addListener('__kblisteners')),
+            removeDataListener:setDescriptor(removeListener('__kblisteners')),
+            addDataUpdateListener:setDescriptor(addListener('__kbupdatelisteners')),
+            removeDataUpdateListener:setDescriptor(removeListener('__kbupdatelisteners')),
+            addDataCreateListener:setDescriptor(addListener('__kbdatacreatelisteners')),
+            removeDataCreateListener:setDescriptor(removeListener('__kbdatacreatelisteners')),
+            addDataRemoveListener:setDescriptor(addListener('__kbdatadeletelisteners')),
+            removeDataRemoveListener:setDescriptor(removeListener('__kbdatadeletelisteners'))
         });
 
         return KObservableData;

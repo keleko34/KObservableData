@@ -4,10 +4,25 @@
 define(['KObservableArray','KObservableObject'],function(KArray,KObject)
 {
     /* Notes */
+    // this library is the 
     // props should be able to be scopeStrings
     // events should include localized scope object as well
     // child listener needs attached to every object and array
 
+    function CreateKObservableData(name)
+    {
+        var _name = {name:name}
+            _data = KObject().addPointer('__kbname')
+    }
+
+
+
+
+
+
+
+
+    /* old code */
     function CreateKObservableData(name)
     {
         var _data = KObject(name),

@@ -12,7 +12,49 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     function CreateKObservableData(name)
     {
         var _name = {name:name}
-            _data = KObject().addPointer('__kbname')
+            _data = KObject().addPointer(_name,'name','__kbname');
+        
+        function eventObject()
+        {
+            this.stopPropogation = function(){this._stopPropogration = true;}
+            this.preventDefault = function(){this._preventDefault = true;}
+            this.local = objarr;
+            this.key = key;
+            this.arguments = args;
+            this.type = action;
+            this.name = objarr.__kbname;
+            this.root = objarr.__kbref;
+            this.scope = objarr.__kbscopeString;
+            this.parent = objarr.___kbImmediateParent;
+            this.value = value;
+            this.oldValue = oldValue;
+        }
+
+        function isArray(v)
+        {
+            return (Object.prototype.toString.call(v) === "[object Array]");
+        }
+
+        function isObject(v)
+        {
+            return (Object.prototype.toString.call(v) === "[object Object]");
+        }
+
+        function isObservable(obj,prop)
+        {
+            return (Object.getOwnPropertyDescriptor(obj,prop).vaue === undefined);
+        }
+
+
+        _data.prototype('updateName',function(v){
+            if(typeof v === 'string') _name.name = v;
+            return this;
+        })
+        .prototype('isArray',isArray)
+        .prototype('isObject',isObject)
+        .prototype('isObservable',isObservable);
+
+        return _data;
     }
 
 

@@ -45,6 +45,30 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return (Object.getOwnPropertyDescriptor(obj,prop).vaue === undefined);
         }
 
+        function parsescopeString(str)
+        {
+            return str.split('.').filter(function(s){return (s.length !== 0);});
+        }
+
+        function getScope(str)
+        {
+            str = parsescopeString(str);
+            function getLayer(obj)
+            {
+                str.splice(0,1);
+                if(str.length === 0)
+                {
+                    return obj;
+                }
+                else
+                {
+                    return getLayer(obj[str[0]]);
+                }
+            }
+
+            return (str.length !== 0 ? getLayer(_data[str[0]]) : _data);
+        }
+
 
         _data.prototype('updateName',function(v){
             if(typeof v === 'string') _name.name = v;
@@ -52,7 +76,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         })
         .prototype('isArray',isArray)
         .prototype('isObject',isObject)
-        .prototype('isObservable',isObservable);
+        .prototype('isObservable',isObservable)
+        .prototype('getScopeByScopeString',getScope);
 
         return _data;
     }

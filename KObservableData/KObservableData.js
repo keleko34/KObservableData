@@ -130,9 +130,52 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return this;
         }
 
-        function parseData()
+        function parseData(data,layer)
         {
+            function parseLayer(dLayer,d)
+            {
+                var currLayerKeys = Object.keys(d),
+                    currLayer,
+                    currScope = '',
+                    newdata;
 
+                for(var x=0,len=currLayerKeys.length;x<len;x++)
+                {
+                    currLayer = d[currLayerKeys[x]];
+                    if(isObject(currLayer) || isArray(currLayer))
+                    {
+                        currScope = dLayer.__kbscopeString+(dLayer.__kbscopeString.length !== 0 ? "." : "")+currLayerKeys[x];
+                        if(isObservable(currLayer))
+                        {
+                            newdata = currLayer;
+                            dLayer.addPointer(currLayerKeys[x],newdata);
+                        }
+                        else
+                        {
+                            newdata = (isObject(currLayer) ? KObject(_name.name,dLayer,currScope) : KArray(_name.name,dLayer,currScope));
+                            dLayer.add(currLayerKeys[x],newdata);
+                            dLayer[currLayerKeys[x]].addPointer(dLayer,'__kbname')
+                            .prototype('isArray',isArray)
+                            .prototype('isObject',isObject)
+                            .prototype('isObservable',isObservable)
+                            .prototype('updateName',updateName)
+                            .prototype('getScopeByScopeString',getScope)
+                            .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
+                            .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
+                            .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
+                            .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+
+                            parseLayer(dLayer[currLayerKeys[x]],currLayer);
+                        }
+                    }
+                    else
+                    {
+                        dLayer.add(currLayerKeys[x],currLayer);
+                    }
+                }
+            }
+
+            parseLayer((layer || _data),data);
         }
 
 
@@ -271,6 +314,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(Object.keys(parent.__kbparentlisteners).length !== 0) nData.__kbparentlisteners = parent.__kbparentlisteners;
                 if(Object.keys(parent.__kbparentupdatelisteners).length !== 0) nData.__kbparentupdatelisteners = parent.__kbparentupdatelisteners;
 
+                
                 Object.defineProperties(nData,{
                   addChildListener:setDescriptor(addChildListener("__kbparentlisteners")),
                   removeChildListener:setDescriptor(removeChildListener("__kbparentlisteners")),

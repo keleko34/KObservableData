@@ -69,6 +69,72 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return (str.length !== 0 ? getLayer(_data[str[0]]) : _data);
         }
 
+        function addChildListener(type)
+        {
+            return function(prop,func)
+            {
+              function recAddListener(objarr,prop,func)
+              {
+                var children = Object.keys(objarr).filter(function(p){
+                  return (isObject(objarr[p]) || isArray(objarr[p]));
+                });
+
+                if(objarr[type][prop] === undefined) objarr[type][prop] = [];
+
+                objarr[type][prop].push(func);
+
+                for(var x=0,len=children.length;x<children;x++)
+                {
+                  recAddListener(children[x],prop,func);
+                }
+              }
+
+              recAddListener(this,prop,func);
+              return this;
+            }
+        }
+
+        function removeChildListener(type)
+        {
+            return function(prop,func)
+            {
+              function recRemoveListener(objarr,prop,func)
+              {
+                var children = Object.keys(objarr).filter(function(p){
+                  return (isObject(objarr[p]) || isArray(objarr[p]));
+                });
+                
+                loop:for(var i=0,lenI=objarr[type][prop].length;i<lenI;i++)
+                {
+                  if(objarr[type][prop][i].toString() === func.toString())
+                  {
+                      objarr[type][prop].splice(i,1);
+                      break loop;
+                  }
+                }
+
+                for(var x=0,len=children.length;x<children;x++)
+                {
+                  recRemoveListener(children[x],prop,func);
+                }
+              }
+
+              recRemoveListener(this,prop,func);
+              return this;
+            }
+        }
+
+        function updateName(v)
+        {
+            if(typeof v === 'string') _name.name = v;
+            return this;
+        }
+
+        function parseData()
+        {
+
+        }
+
 
         _data.prototype('updateName',function(v){
             if(typeof v === 'string') _name.name = v;
@@ -77,7 +143,12 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         .prototype('isArray',isArray)
         .prototype('isObject',isObject)
         .prototype('isObservable',isObservable)
-        .prototype('getScopeByScopeString',getScope);
+        .prototype('updateName',updateName)
+        .prototype('getScopeByScopeString',getScope)
+        .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
+        .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
+        .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
+        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
 
         return _data;
     }

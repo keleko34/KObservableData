@@ -32,17 +32,7 @@
     "url": "https://github.com/keleko34/KObservableData/issues"
   },
   "devDependencies": {
-    "K_Tasks": "^0.2.8",
-    "commander": "^2.9.0",
-    "gulp": "^3.9.1",
-    "gulp-closure-compiler": "^0.4.0",
-    "gulp-connect": "^5.0.0",
-    "gulp-file": "^0.2.0",
-    "gulp-inject": "^3.0.0",
-    "gulp-modify": "^0.1.1",
-    "gulp-prompt": "^0.1.2",
-    "gulp-replace": "^0.5.4",
-    "js-beautify": "^1.6.4"
+    "K_Tasks": "^0.4.0"
   },
   "scripts": {
     "installer": "npm i git+https://github.com/keleko34/gulp.git -g && npm i && bower i",
@@ -58,7 +48,7 @@
   ],
   "directories": {},
   "dependencies": {
-    "KObservableArray": "^1.0.4",
-    "KObservableObject": "^1.0.2"
+    "KObservableArray": "^1.1.2",
+    "KObservableObject": "^1.1.8"
   }
 }

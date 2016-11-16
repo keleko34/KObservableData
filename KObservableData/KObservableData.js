@@ -7,63 +7,6 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     // overwrite add,set,remove, all listeners to allow for scopestrings, events get localized
     // rework how the object and array events work
 
-    /* Overwrites */
-
-    function set()
-    {
-
-    }
-
-    function add()
-    {
-
-    }
-
-    function remove()
-    {
-
-    }
-
-    function addDataListener()
-    {
-
-    }
-
-    function removeDataListener()
-    {
-
-    }
-
-    function addDataUpdateListener()
-    {
-
-    }
-
-    function removeDataUpdateListener()
-    {
-
-    }
-
-    function addDataCreateListener()
-    {
-
-    }
-
-    function removeDataCreateListener()
-    {
-
-    }
-
-    function addDataRemoveListener()
-    {
-
-    }
-
-    function removeDataRemoveListener()
-    {
-
-    }
-
     function overwrite(objarr)
     {
 

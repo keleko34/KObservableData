@@ -9,7 +9,15 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
 
     function overwrite(objarr)
     {
-
+        objarr.prototype('isArray',isArray)
+        .prototype('isObject',isObject)
+        .prototype('isObservable',isObservable)
+        .prototype('updateName',updateName)
+        .prototype('getScopeByScopeString',getScope)
+        .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
+        .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
+        .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
+        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
     }
 
     /* Main */
@@ -153,21 +161,13 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                         {
                             newdata = currLayer;
                             dLayer.addPointer(currLayerKeys[x],newdata);
+                            overwrite(dLayer);
                         }
                         else
                         {
                             newdata = (isObject(currLayer) ? KObject(_name.name,dLayer,currScope) : KArray(_name.name,dLayer,currScope));
                             dLayer.add(currLayerKeys[x],newdata);
-                            dLayer[currLayerKeys[x]].addPointer(dLayer,'__kbname')
-                            .prototype('isArray',isArray)
-                            .prototype('isObject',isObject)
-                            .prototype('isObservable',isObservable)
-                            .prototype('updateName',updateName)
-                            .prototype('getScopeByScopeString',getScope)
-                            .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
-                            .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
-                            .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
-                            .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+                            dLayer[currLayerKeys[x]].addPointer(dLayer,'__kbname');
 
                             parseLayer(dLayer[currLayerKeys[x]],currLayer);
                         }
@@ -185,16 +185,9 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         _data.prototype('updateName',function(v){
             if(typeof v === 'string') _name.name = v;
             return this;
-        })
-        .prototype('isArray',isArray)
-        .prototype('isObject',isObject)
-        .prototype('isObservable',isObservable)
-        .prototype('updateName',updateName)
-        .prototype('getScopeByScopeString',getScope)
-        .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
-        .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
-        .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
-        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+        });
+
+        overwrite(_data);
 
         return _data;
     }

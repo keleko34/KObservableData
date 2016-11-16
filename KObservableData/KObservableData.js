@@ -17,7 +17,31 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
         .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
         .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
-        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'))
+        .addActionListener('addDataListener',function(a){
+            
+        })
+        .addActionListener('addDataUpdateListener',function(a){
+            
+        })
+        .addActionListener('addDataCreateListener',function(a){
+            
+        })
+        .addActionListener('addDataDeleteListener',function(a){
+            
+        })
+        .addActionListener('removeDataListener',function(a){
+
+        })
+        .addActionListener('removeDataUpdateListener',function(a){
+            
+        })
+        .addActionListener('removeDataCreateListener',function(a){
+            
+        })
+        .addActionListener('removeDataDeleteListener',function(a){
+            
+        })
     }
 
     /* Main */

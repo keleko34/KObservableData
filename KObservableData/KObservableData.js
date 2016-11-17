@@ -71,12 +71,19 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         function routeListener(a)
         {
             var sp = a.key.split('.');
-            if(sp.length === 1)
+            if(sp.length === 1 && a.key !== '*')
             {
                 a.preventDefault();
                 return false;
             }
-            getScope(a.event.local,a.key)[a.type](a.key,a.args[1]);
+            if(a.key !== '*')
+            {
+                getScope(a.event.local,a.key)[a.type](a.key,a.args[1]);
+            }
+            else
+            {
+                a.event.local.addChildListener('*',a.args[1]);
+            }
         }
 
         function overwrite(objarr)

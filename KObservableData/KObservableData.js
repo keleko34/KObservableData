@@ -7,43 +7,6 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     // overwrite add,set,remove, all listeners to allow for scopestrings, events get localized
     // rework how the object and array events work
 
-    function overwrite(objarr)
-    {
-        objarr.prototype('isArray',isArray)
-        .prototype('isObject',isObject)
-        .prototype('isObservable',isObservable)
-        .prototype('updateName',updateName)
-        .prototype('getScopeByScopeString',getScope)
-        .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
-        .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
-        .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
-        .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'))
-        .addActionListener('addDataListener',function(a){
-            
-        })
-        .addActionListener('addDataUpdateListener',function(a){
-            
-        })
-        .addActionListener('addDataCreateListener',function(a){
-            
-        })
-        .addActionListener('addDataDeleteListener',function(a){
-            
-        })
-        .addActionListener('removeDataListener',function(a){
-
-        })
-        .addActionListener('removeDataUpdateListener',function(a){
-            
-        })
-        .addActionListener('removeDataCreateListener',function(a){
-            
-        })
-        .addActionListener('removeDataDeleteListener',function(a){
-            
-        })
-    }
-
     /* Main */
     function CreateKObservableData(name)
     {
@@ -86,7 +49,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return str.split('.').filter(function(s){return (s.length !== 0);});
         }
 
-        function getScope(str)
+        function getScope(obj,str)
         {
             str = parsescopeString(str);
             function getLayer(obj)
@@ -102,7 +65,39 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 }
             }
 
-            return (str.length !== 0 ? getLayer(_data[str[0]]) : _data);
+            return (str && str.length !== 1 ? getLayer(obj[str[0]]) : (str && str.length ? obj[str[0]] : obj));
+        }
+
+        function routeListener(a)
+        {
+            var sp = a.key.split('.');
+            if(sp.length === 1)
+            {
+                a.preventDefault();
+                return false;
+            }
+            getScope(a.event.local,a.key)[a.type](a.key,a.args[1]);
+        }
+
+        function overwrite(objarr)
+        {
+            objarr.prototype('isArray',isArray)
+            .prototype('isObject',isObject)
+            .prototype('isObservable',isObservable)
+            .prototype('updateName',updateName)
+            .prototype('getScopeByScopeString',getScope)
+            .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
+            .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
+            .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
+            .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'))
+            .addActionListener('addDataListener',routeListener)
+            .addActionListener('addDataUpdateListener',routeListener)
+            .addActionListener('addDataCreateListener',routeListener)
+            .addActionListener('addDataDeleteListener',routeListener)
+            .addActionListener('removeDataListener',routeListener)
+            .addActionListener('removeDataUpdateListener',routeListener)
+            .addActionListener('removeDataCreateListener',routeListener)
+            .addActionListener('removeDataDeleteListener',routeListener);
         }
 
         function addChildListener(type)
@@ -204,7 +199,6 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             parseLayer((layer || _data),data);
         }
-
 
         _data.prototype('updateName',function(v){
             if(typeof v === 'string') _name.name = v;

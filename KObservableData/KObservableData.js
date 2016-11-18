@@ -82,7 +82,14 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             else
             {
-                a.event.local.addChildListener('*',a.args[1]);
+              if(a.event.listener.indexOf('update'))
+              {
+                a.event.local.addChildDataUpdateListener('*',a.args[1]);
+              }
+              else
+              {
+                a.event.local.addChildDataListener('*',a.args[1]);
+              }
             }
         }
 

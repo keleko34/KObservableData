@@ -192,7 +192,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                         else
                         {
                             newdata = (isObject(currLayer) ? KObject(_name.name,dLayer,currScope) : KArray(_name.name,dLayer,currScope));
-                            dLayer.add(currLayerKeys[x],newdata);
+                            dLayer.set(currLayerKeys[x],newdata);
                             dLayer[currLayerKeys[x]].addPointer(dLayer,'__kbname');
 
                             parseLayer(dLayer[currLayerKeys[x]],currLayer);
@@ -200,7 +200,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                     }
                     else
                     {
-                        dLayer.add(currLayerKeys[x],currLayer);
+                        dLayer.set(currLayerKeys[x],currLayer);
                     }
                 }
             }

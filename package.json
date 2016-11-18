@@ -1,6 +1,6 @@
 {
   "name": "KObservableData",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Multilayer Observable data that uses KObservableArrays and KObservableObjects",
   "keywords": [
     "Object",

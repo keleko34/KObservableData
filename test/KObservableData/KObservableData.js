@@ -13,7 +13,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     function CreateKObservableData(name)
     {
         var _name = {name:name}
-            _data = KObject().addPointer(_name,'name','__kbname');
+            _data = KObject(_name.name,undefined,"").addPointer(_name,'name','__kbname');
         
         function eventObject()
         {
@@ -190,7 +190,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(!isObservable(a.args[1]))
                 {
                     a.preventDefault();
-                    var str = a.event.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                    var str = a.event.local.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
                     builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
                     a.event.local.add(a.key,builder)
                     overwrite(a.event.local[a.key]).parseData(a.args[1]);
@@ -205,7 +205,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(!isObservable(a.args[1]))
                 {
                     a.preventDefault();
-                    var str = a.event.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                    var str = a.event.local.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
                     builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
                     a.event.local.set(a.key,builder);
                     overwrite(a.event.local[a.key]).parseData(a.args[1]);

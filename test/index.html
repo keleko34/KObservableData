@@ -2,15 +2,41 @@
 <html>
   <head>
     <title>Testing</title>
-    <script type="text/javascript" src="requirejs"></script>
+    <script type="text/javascript" src="KObservableData/Build/KObservableData.js"></script>
   </head>
   <body>
     <div id="testDisplay"></div>
     <script type="text/javascript">
-      require(['/KObservableData/Min/KObservableData.min.js'],function(CreateKObservableData){
-        var OData = CreateKObservableData("test","array");
-        console.log("kloaded",OData);
-      });
+      var KData = KObservableData('cool');
+
+      function cool(info)
+      {
+        this.stuff = 'yay';
+        this.list = [
+          {name:"george",position:'forward'},
+          {name:"philly",position:'backup'},
+          {name:"sam",position:'center'},
+          {name:"bernard",position:'defense'},
+          {name:"cal",position:'offense'},
+        ];
+
+        this.ComponentName = 'cool';
+
+        this.info = info;
+      }
+
+      cool.call(KData,"something new");
+
+      for(var x=0,keys=Object.keys(KData),len=keys.length;x<len;x++)
+      {
+          if(!KData.isObservable(KData,keys[x]))
+          {
+              KData.set(keys[x],KData[keys[x]]);
+          }
+      }
+
+      console.log(KData);
+
     </script>
   </body>
 </html>

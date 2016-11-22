@@ -7,6 +7,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     // overwrite add,set,remove, all listeners to allow for scopestrings, events get localized
     // rework how the object and array events work
 
+    //convert parseData into set and add
+
     /* Main */
     function CreateKObservableData(name)
     {
@@ -41,7 +43,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
 
         function isObservable(obj,prop)
         {
-            return (Object.getOwnPropertyDescriptor(obj,prop).vaue === undefined);
+            if(!prop) return obj.__kbname !== undefined;
+            return (Object.getOwnPropertyDescriptor(obj,prop).value === undefined);
         }
 
         function parsescopeString(str)
@@ -82,29 +85,40 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             else
             {
-                a.event.local.addChildListener('*',a.args[1]);
+              if(a.event.listener.indexOf('update'))
+              {
+                a.event.local.addChildDataUpdateListener('*',a.args[1]);
+              }
+              else
+              {
+                a.event.local.addChildDataListener('*',a.args[1]);
+              }
             }
         }
 
         function overwrite(objarr)
         {
-            objarr.prototype('isArray',isArray)
-            .prototype('isObject',isObject)
-            .prototype('isObservable',isObservable)
-            .prototype('updateName',updateName)
-            .prototype('getScopeByScopeString',getScope)
-            .prototype('addChildDataListener',addChildListener('__kbparentlisteners'))
-            .prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'))
-            .prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'))
-            .prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'))
+            if(objarr.parseData === undefined) objarr.prototype('parseData',parseData);
+            if(objarr.isArray === undefined) objarr.prototype('isArray',isArray);
+            if(objarr.isObject === undefined) objarr.prototype('isObject',isObject);
+            if(objarr.isObservable === undefined) objarr.prototype('isObservable',isObservable);
+            if(objarr.updateName === undefined) objarr.prototype('updateName',updateName);
+            if(objarr.getScopeByScopeString === undefined) objarr.prototype('getScopeByScopeString',getScope);
+            if(objarr.addChildDataListener === undefined) objarr.prototype('addChildDataListener',addChildListener('__kbparentlisteners'));
+            if(objarr.removeChildDataListener === undefined) objarr.prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'));
+            if(objarr.addChildDataUpdateListener === undefined) objarr.prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'));
+            if(objarr.removeChildDataUpdateListener === undefined) objarr.prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+
+            return objarr.addActionListener('add',addData)
+            .addActionListener('set',setData)
             .addActionListener('addDataListener',routeListener)
             .addActionListener('addDataUpdateListener',routeListener)
             .addActionListener('addDataCreateListener',routeListener)
-            .addActionListener('addDataDeleteListener',routeListener)
+            .addActionListener('addDataRemoveListener',routeListener)
             .addActionListener('removeDataListener',routeListener)
             .addActionListener('removeDataUpdateListener',routeListener)
             .addActionListener('removeDataCreateListener',routeListener)
-            .addActionListener('removeDataDeleteListener',routeListener);
+            .addActionListener('removeDataRemoveListener',routeListener);
         }
 
         function addChildListener(type)
@@ -168,49 +182,45 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return this;
         }
 
-        function parseData(data,layer)
+        //these take care of recursion for us, hehe
+        function addData(a)
         {
-            function parseLayer(dLayer,d)
+            if(isObject(a.args[1]) || isArray(a.args[1]))
             {
-                var currLayerKeys = Object.keys(d),
-                    currLayer,
-                    currScope = '',
-                    newdata;
-
-                for(var x=0,len=currLayerKeys.length;x<len;x++)
+                if(!isObservable(a.args[1]))
                 {
-                    currLayer = d[currLayerKeys[x]];
-                    if(isObject(currLayer) || isArray(currLayer))
-                    {
-                        currScope = dLayer.__kbscopeString+(dLayer.__kbscopeString.length !== 0 ? "." : "")+currLayerKeys[x];
-                        if(isObservable(currLayer))
-                        {
-                            newdata = currLayer;
-                            dLayer.addPointer(currLayerKeys[x],newdata);
-                            overwrite(dLayer);
-                        }
-                        else
-                        {
-                            newdata = (isObject(currLayer) ? KObject(_name.name,dLayer,currScope) : KArray(_name.name,dLayer,currScope));
-                            dLayer.set(currLayerKeys[x],newdata);
-                            dLayer[currLayerKeys[x]].addPointer(dLayer,'__kbname');
-
-                            parseLayer(dLayer[currLayerKeys[x]],currLayer);
-                        }
-                    }
-                    else
-                    {
-                        dLayer.set(currLayerKeys[x],currLayer);
-                    }
+                    a.preventDefault();
+                    var str = a.event.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                    builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
+                    a.event.local.add(a.key,builder)
+                    overwrite(a.event.local[a.key]).parseData(a.args[1]);
                 }
             }
-            parseLayer((layer || _data),data);
         }
 
-        _data.prototype('updateName',function(v){
-            if(typeof v === 'string') _name.name = v;
+        function setData(a)
+        {
+            if(isObject(a.args[1]) || isArray(a.args[1]))
+            {
+                if(!isObservable(a.args[1]))
+                {
+                    a.preventDefault();
+                    var str = a.event.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                    builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
+                    a.event.local.set(a.key,builder);
+                    overwrite(a.event.local[a.key]).parseData(a.args[1]);
+                }
+            }
+        }
+
+        function parseData(data)
+        {
+            for(var x=0,keys=Object.keys(data),len=keys.length;x<len;x++)
+            {
+                this.set(keys[x],data[keys[x]]);
+            }
             return this;
-        });
+        }
 
         overwrite(_data);
 

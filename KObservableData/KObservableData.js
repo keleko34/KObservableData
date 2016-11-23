@@ -61,23 +61,24 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             var sp = a.key.split('.');
             if(sp.length === 1 && a.key !== '*')
             {
-                a.preventDefault();
                 return false;
             }
             if(a.key !== '*')
             {
+                a.preventDefault();
                 getScope(a.event.local,sp.slice(0,(sp.length-1)).join('.'))[a.type](sp[(sp.length-1)],a.args[1]);
             }
             else
             {
-              if(a.type.toLowerCase().indexOf('update') !== -1)
-              {
-                a.event.local.addChildDataUpdateListener('*',a.args[1]);
-              }
-              else
-              {
-                a.event.local.addChildDataListener('*',a.args[1]);
-              }
+                a.preventDefault();
+                if(a.type.toLowerCase().indexOf('update') !== -1)
+                {
+                    a.event.local.addChildDataUpdateListener('*',a.args[1]);
+                }
+                else
+                {
+                    a.event.local.addChildDataListener('*',a.args[1]);
+                }
             }
         }
 

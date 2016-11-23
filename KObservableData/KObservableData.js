@@ -15,22 +15,6 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         var _name = {name:name},
             _type = (typeof type === 'string' && type.toLowercase() === 'array' ? KArray : KObject)
             _data = _type(_name.name,undefined,"").addPointer(_name,'name','__kbname');
-        
-        function eventObject()
-        {
-            this.stopPropogation = function(){this._stopPropogration = true;}
-            this.preventDefault = function(){this._preventDefault = true;}
-            this.local = objarr;
-            this.key = key;
-            this.arguments = args;
-            this.type = action;
-            this.name = objarr.__kbname;
-            this.root = objarr.__kbref;
-            this.scope = objarr.__kbscopeString;
-            this.parent = objarr.___kbImmediateParent;
-            this.value = value;
-            this.oldValue = oldValue;
-        }
 
         function isArray(v)
         {
@@ -45,7 +29,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         function isObservable(obj,prop)
         {
             if(!prop) return obj.__kbname !== undefined;
-            return (Object.getOwnPropertyDescriptor(obj,prop).value === undefined);
+            return (obj[prop] ? Object.getOwnPropertyDescriptor(obj,prop).value === undefined : false);
         }
 
         function parsescopeString(str)
@@ -65,7 +49,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 }
                 else
                 {
-                    return getLayer(obj[str[0]]);
+                    return (obj[str[0]] ? getLayer(obj[str[0]]) : obj);
                 }
             }
 
@@ -82,11 +66,11 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             if(a.key !== '*')
             {
-                getScope(a.event.local,a.key)[a.type](a.key,a.args[1]);
+                getScope(a.event.local,sp.slice(0,(sp.length-1)).join('.'))[a.type](sp[(sp.length-1)],a.args[1]);
             }
             else
             {
-              if(a.event.listener.indexOf('update'))
+              if(a.type.toLowerCase().indexOf('update') !== -1)
               {
                 a.event.local.addChildDataUpdateListener('*',a.args[1]);
               }

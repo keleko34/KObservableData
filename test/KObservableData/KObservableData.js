@@ -10,26 +10,11 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
     //convert parseData into set and add
 
     /* Main */
-    function CreateKObservableData(name)
+    function CreateKObservableData(name,type)
     {
-        var _name = {name:name}
-            _data = KObject(_name.name,undefined,"").addPointer(_name,'name','__kbname');
-        
-        function eventObject()
-        {
-            this.stopPropogation = function(){this._stopPropogration = true;}
-            this.preventDefault = function(){this._preventDefault = true;}
-            this.local = objarr;
-            this.key = key;
-            this.arguments = args;
-            this.type = action;
-            this.name = objarr.__kbname;
-            this.root = objarr.__kbref;
-            this.scope = objarr.__kbscopeString;
-            this.parent = objarr.___kbImmediateParent;
-            this.value = value;
-            this.oldValue = oldValue;
-        }
+        var _name = {name:name},
+            _type = (typeof type === 'string' && type.toLowercase() === 'array' ? KArray : KObject)
+            _data = _type(_name.name,undefined,"").addPointer(_name,'name','__kbname');
 
         function isArray(v)
         {
@@ -44,7 +29,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         function isObservable(obj,prop)
         {
             if(!prop) return obj.__kbname !== undefined;
-            return (Object.getOwnPropertyDescriptor(obj,prop).value === undefined);
+            return (obj[prop] ? Object.getOwnPropertyDescriptor(obj,prop).value === undefined : false);
         }
 
         function parsescopeString(str)
@@ -64,7 +49,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 }
                 else
                 {
-                    return getLayer(obj[str[0]]);
+                    return (obj[str[0]] ? getLayer(obj[str[0]]) : obj);
                 }
             }
 
@@ -81,7 +66,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             if(a.key !== '*')
             {
-                getScope(a.event.local,a.key)[a.type](a.key,a.args[1]);
+                getScope(a.event.local,sp.slice(0,(sp.length-1)).join('.'))[a.type](sp[(sp.length-1)],a.args[1]);
             }
             else
             {
@@ -190,10 +175,12 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(!isObservable(a.args[1]))
                 {
                     a.preventDefault();
-                    var str = a.event.local.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
-                    builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
-                    a.event.local.add(a.key,builder)
-                    overwrite(a.event.local[a.key]).parseData(a.args[1]);
+                    var local = a.event.local,
+                        str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                        builder = (isObject(a.args[1]) ? KObject : KArray)(local.__kbname,local,str);
+
+                    local.add(a.key,builder);
+                    overwrite(local[a.key]).parseData(a.args[1]);
                 }
             }
         }
@@ -205,10 +192,12 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                 if(!isObservable(a.args[1]))
                 {
                     a.preventDefault();
-                    var str = a.event.local.__kbscopeString+(a.event.local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
-                    builder = (isObject(a.args[1]) ? KObject : KArray)(a.event.local.__kbname,a.event.local,str);
-                    a.event.local.set(a.key,builder);
-                    overwrite(a.event.local[a.key]).parseData(a.args[1]);
+                    var local = a.event.local,
+                        str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
+                        builder = (isObject(a.args[1]) ? KObject : KArray)(local.__kbname,local,str);
+
+                    local.set(a.key,builder);
+                    overwrite(local[a.key]).parseData(a.args[1]);
                 }
             }
         }

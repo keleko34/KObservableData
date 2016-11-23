@@ -96,13 +96,13 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
             else
             {
-                var children = Object.keys(objarr).filter(function(p){
-                    return (isObject(objarr[p]) || isArray(objarr[p]));
+                var children = Object.keys(a.event.local).filter(function(p){
+                    return (isObject(a.event.local[p]) || isArray(a.event.local[p]));
                 });
 
                 for(var x=0,len=children.length;x<len;x++)
                 {
-                    objarr[children[x]].subscribe(a.key,a.args[1]);
+                    a.event.local[children[x]].subscribe(a.key,a.args[1]);
                 }
             }
         }

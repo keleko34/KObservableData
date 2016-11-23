@@ -82,6 +82,38 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             }
         }
 
+        function routeSubscriber(a)
+        {
+            var sp = a.key.split('.');
+            if(sp.length === 1 && a.key !== '*')
+            {
+                return false;
+            }
+            if(a.key !== '*')
+            {
+                a.preventDefault();
+                getScope(a.event.local,sp.slice(0,(sp.length-1)).join('.'))[a.type](sp[(sp.length-1)],a.args[1]);
+            }
+            else
+            {
+                a.preventDefault();
+                function recAddSubscriber(objarr,func)
+                {
+                    objarr.subscribe(a.key,func);
+
+                    var children = Object.keys(objarr).filter(function(p){
+                        return (isObject(objarr[p]) || isArray(objarr[p]));
+                    });
+
+                    for(var x=0,len=children.length;x<len;x++)
+                    {
+                        recAddSubscriber(objarr[children[x]],func);
+                    }
+                }
+                recAddSubscriber(a.event.local,a.args[1]);
+            }
+        }
+
         function overwrite(objarr)
         {
             if(objarr.parseData === undefined) objarr.prototype('parseData',parseData);
@@ -97,6 +129,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
 
             return objarr.addActionListener('add',addData)
             .addActionListener('set',setData)
+            .addActionListener('subscribe',routeSubscriber)
+            .addActionListener('unsubscribe',routeSubscriber)
             .addActionListener('addDataListener',routeListener)
             .addActionListener('addDataUpdateListener',routeListener)
             .addActionListener('addDataCreateListener',routeListener)

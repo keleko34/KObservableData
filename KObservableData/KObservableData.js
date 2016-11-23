@@ -123,7 +123,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
 
                 for(var x=0,len=children.length;x<len;x++)
                 {
-                  recAddListener(objar[children[x]],prop,func);
+                  recAddListener(objarr[children[x]],prop,func);
                 }
               }
 

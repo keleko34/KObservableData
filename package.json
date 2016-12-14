@@ -49,7 +49,7 @@
   ],
   "directories": {},
   "dependencies": {
-    "KObservableArray": "^1.2.0",
-    "KObservableObject": "^1.2.4"
+    "KObservableArray": "^1.2.5",
+    "KObservableObject": "^1.2.8"
   }
 }

@@ -195,7 +195,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return this;
         }
 
-        //these take care of recursion for us, hehe
+        //these take care of recursion for us
         function addData(a)
         {
             if(isObject(a.args[1]) || isArray(a.args[1]))

@@ -56,6 +56,33 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             return (str && str.length !== 1 ? getLayer(obj[str[0]]) : (str && str.length ? obj[str[0]] : obj));
         }
 
+        function setScope(obj,str,val)
+        {
+          str = parsescopeString(str);
+          function setLayer(obj)
+          {
+            str.splice(0,1);
+            if(str.length === 1)
+            {
+                obj[str[0]] = val;
+            }
+            else
+            {
+                setLayer(obj[str[0]]);
+            }
+          }
+
+          if(str && str.length !== 1)
+          {
+            setLayer(obj[str[0]]);
+          }
+          else if(str && str.length)
+          {
+            obj[str[0]] = val;
+          }
+          return this;
+        }
+
         function routeListener(a)
         {
             var sp = a.key.split('.');
@@ -115,6 +142,7 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             if(objarr.isObservable === undefined) objarr.prototype('isObservable',isObservable);
             if(objarr.updateName === undefined) objarr.prototype('updateName',updateName);
             if(objarr.getScopeByScopeString === undefined) objarr.prototype('getScopeByScopeString',getScope);
+            if(objarr.setScopeByScopeString === undefined) objarr.prototype('setScopeByScopeString',setScope);
             if(objarr.addChildDataListener === undefined) objarr.prototype('addChildDataListener',addChildListener('__kbparentlisteners'));
             if(objarr.removeChildDataListener === undefined) objarr.prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'));
             if(objarr.addChildDataUpdateListener === undefined) objarr.prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'));

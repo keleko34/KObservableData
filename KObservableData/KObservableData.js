@@ -236,7 +236,18 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                         builder = (isObject(a.event.value) ? KObject : KArray)(local.__kbname,local,str);
                     
                     overwrite(builder).parseData(a.event.value);
-                    local.add(a.key,builder);
+                    if(local[a.key] === undefined)
+                    {
+                      local.add(a.key,builder);
+                    }
+                    else if(isArray(local))
+                    {
+                      local.splice(a.key,0,builder);
+                    }
+                    else if(isObject(local))
+                    {
+                      local.set(a.key,builder);
+                    }
                 }
             }
         }

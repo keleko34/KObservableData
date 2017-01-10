@@ -226,34 +226,34 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         //these take care of recursion for us
         function addData(a)
         {
-            if(isObject(a.args[1]) || isArray(a.args[1]))
+            if(isObject(a.event.value) || isArray(a.event.value))
             {
-                if(!isObservable(a.args[1]))
+                if(!isObservable(a.event.value))
                 {
                     a.preventDefault();
                     var local = a.event.local,
                         str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
-                        builder = (isObject(a.args[1]) ? KObject : KArray)(local.__kbname,local,str);
+                        builder = (isObject(a.event.value) ? KObject : KArray)(local.__kbname,local,str);
 
                     local.add(a.key,builder);
-                    overwrite(local[a.key]).parseData(a.args[1]);
+                    overwrite(local[a.key]).parseData(a.event.value);
                 }
             }
         }
 
         function setData(a)
         {
-            if(isObject(a.args[1]) || isArray(a.args[1]))
+            if(isObject(a.event.value) || isArray(a.event.value))
             {
-                if(!isObservable(a.args[1]))
+                if(!isObservable(a.event.value))
                 {
                     a.preventDefault();
                     var local = a.event.local,
                         str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
-                        builder = (isObject(a.args[1]) ? KObject : KArray)(local.__kbname,local,str);
+                        builder = (isObject(a.event.value) ? KObject : KArray)(local.__kbname,local,str);
 
                     local.set(a.key,builder);
-                    overwrite(local[a.key]).parseData(a.args[1]);
+                    overwrite(local[a.key]).parseData(a.event.value);
                 }
             }
         }

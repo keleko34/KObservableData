@@ -234,9 +234,9 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                     var local = a.event.local,
                         str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
                         builder = (isObject(a.event.value) ? KObject : KArray)(local.__kbname,local,str);
-
+                    
+                    overwrite(builder).parseData(a.event.value);
                     local.add(a.key,builder);
-                    overwrite(local[a.key]).parseData(a.event.value);
                 }
             }
         }
@@ -251,9 +251,9 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                     var local = a.event.local,
                         str = local.__kbscopeString+(local.__kbscopeString.length !== 0 ? '.' : '')+a.key,
                         builder = (isObject(a.event.value) ? KObject : KArray)(local.__kbname,local,str);
-
+                  
+                    overwrite(builder).parseData(a.event.value);
                     local.set(a.key,builder);
-                    overwrite(local[a.key]).parseData(a.event.value);
                 }
             }
         }

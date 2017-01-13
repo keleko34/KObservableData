@@ -242,7 +242,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
                     }
                     else if(isArray(local))
                     {
-                      local.splice(a.key,0,builder);
+                      builder.splice(0,0,a.key,0);
+                      local.splice.apply(local,builder);
                     }
                     else if(isObject(local))
                     {

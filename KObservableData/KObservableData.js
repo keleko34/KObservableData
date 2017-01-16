@@ -31,6 +31,16 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             if(!prop) return obj.__kbname !== undefined;
             return (obj[prop] ? Object.getOwnPropertyDescriptor(obj,prop).value === undefined : false);
         }
+      
+        function actionObject(type,prop,ev,args)
+        {
+            this.stopPropogation = function(){this._stopPropogration = true;}
+            this.preventDefault = function(){this._preventDefault = true;}
+            this.type = type;
+            this.key = prop;
+            this.event = ev;
+            this.args = args;
+        }
 
         function parsescopeString(str)
         {
@@ -147,6 +157,8 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             if(objarr.removeChildDataListener === undefined) objarr.prototype('removeChildDataListener',removeChildListener('__kbparentlisteners'));
             if(objarr.addChildDataUpdateListener === undefined) objarr.prototype('addChildDataUpdateListener',addChildListener('__kbparentupdatelisteners'));
             if(objarr.removeChildDataUpdateListener === undefined) objarr.prototype('removeChildDataUpdateListener',removeChildListener('__kbparentupdatelisteners'));
+            if(objarr.setUnobservable === undefined) objarr.prototype('setUnobservable',setUnobservable);
+            if(objarr.addUnobservable === undefined) objarr.prototype('addUnobservable',addUnobservable);
 
             return objarr.addActionListener('add',addData)
             .addActionListener('set',setData)
@@ -159,7 +171,19 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
             .addActionListener('removeDataListener',routeListener)
             .addActionListener('removeDataUpdateListener',routeListener)
             .addActionListener('removeDataCreateListener',routeListener)
-            .addActionListener('removeDataRemoveListener',routeListener);
+            .addActionListener('removeDataRemoveListener',routeListener)
+            .addDataUpdateListener('*',function(e){
+                if(!this._stopChange)
+                {
+                  setData(new actionObject('set',e.key,e,[e.value]));
+                }
+                else
+                {
+                  this._stopChange = false;
+                }
+            
+            });
+          
         }
 
         function addChildListener(type)
@@ -221,6 +245,24 @@ define(['KObservableArray','KObservableObject'],function(KArray,KObject)
         {
             if(typeof v === 'string') _name.name = v;
             return this;
+        }
+      
+        function setUnobservable(key,value)
+        {
+          this.stopChange()[key] = value;
+          return this;
+        }
+      
+        function addUnobservable(key,value)
+        {
+          if(this[key] === undefined)
+          {
+            this[key] = value;
+          }
+          else
+          {
+            console.error('');
+          }
         }
 
         //these take care of recursion for us
